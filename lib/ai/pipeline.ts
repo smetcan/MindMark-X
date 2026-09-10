@@ -2,7 +2,8 @@ import { db } from "../db";
 import { bookmarks, categories, settings, type Bookmark } from "../db/schema";
 import { eq, or, inArray, and } from "drizzle-orm";
 import { analyzeWithGemini, extractOcrWithGemini } from "./gemini";
-import { analyzeWithOpenAICompat, extractOcrWithOpenRouter } from "./openai-compat";
+import { analyzeWithAnthropic, extractOcrWithAnthropic } from "./anthropic";
+import { analyzeWithOpenAICompat, extractOcrWithOpenAI, extractOcrWithOpenRouter } from "./openai-compat";
 import { BookmarkAnalysisInput, CategoryInfo } from "./types";
 
 interface PipelineState {
@@ -51,11 +52,19 @@ export async function startPipeline(options: {
   const googleKey = config.get("google_api_key") || process.env.GOOGLE_API_KEY || "";
   const deepseekKey = config.get("deepseek_api_key") || process.env.DEEPSEEK_API_KEY || "";
   const openrouterKey = config.get("openrouter_api_key") || process.env.OPENROUTER_API_KEY || "";
+  const openaiKey = config.get("openai_api_key") || process.env.OPENAI_API_KEY || "";
+  const anthropicKey = config.get("anthropic_api_key") || process.env.ANTHROPIC_API_KEY || "";
   const enableVision = config.get("enable_vision") === "true";
 
   // Validate API key for active provider
   if (provider === "google" && !googleKey) {
     throw new Error("Google Gemini API Key is missing. Please set it in Settings.");
+  }
+  if (provider === "openai" && !openaiKey) {
+    throw new Error("OpenAI API Key is missing. Please set it in Settings.");
+  }
+  if (provider === "anthropic" && !anthropicKey) {
+    throw new Error("Anthropic API Key is missing. Please set it in Settings.");
   }
   if (provider === "deepseek" && !deepseekKey) {
     throw new Error("DeepSeek API Key is missing. Please set it in Settings.");
@@ -135,6 +144,18 @@ export async function startPipeline(options: {
                   googleKey,
                   config.get("google_model") || "gemini-2.5-flash"
                 );
+              } else if (provider === "openai" && openaiKey) {
+                visionText = await extractOcrWithOpenAI(
+                  photo.url,
+                  openaiKey,
+                  config.get("openai_model") || "gpt-4o-mini"
+                );
+              } else if (provider === "anthropic" && anthropicKey) {
+                visionText = await extractOcrWithAnthropic(
+                  photo.url,
+                  anthropicKey,
+                  config.get("anthropic_model") || "claude-3-5-haiku-20241022"
+                );
               } else if (provider === "openrouter" && openrouterKey) {
                 visionText = await extractOcrWithOpenRouter(
                   photo.url,
@@ -163,6 +184,19 @@ export async function startPipeline(options: {
               input,
               googleKey,
               config.get("google_model") || "gemini-2.5-flash"
+            );
+          } else if (provider === "openai") {
+            result = await analyzeWithOpenAICompat(
+              input,
+              openaiKey,
+              "https://api.openai.com/v1",
+              config.get("openai_model") || "gpt-4o-mini"
+            );
+          } else if (provider === "anthropic") {
+            result = await analyzeWithAnthropic(
+              input,
+              anthropicKey,
+              config.get("anthropic_model") || "claude-3-5-haiku-20241022"
             );
           } else if (provider === "deepseek") {
             result = await analyzeWithOpenAICompat(
