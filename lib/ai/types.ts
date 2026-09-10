@@ -1,4 +1,4 @@
-export type AIProviderType = "google" | "deepseek" | "openrouter";
+export type AIProviderType = "google" | "deepseek" | "openrouter" | "openai" | "anthropic";
 
 export interface CategoryInfo {
   id: string; // slug, e.g. 'dev-tools'

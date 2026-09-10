@@ -1,4 +1,4 @@
-﻿import { db } from "./index";
+import { db } from "./index";
 import { categories, settings } from "./schema";
 
 export const DEFAULT_CATEGORIES = [
@@ -88,6 +88,16 @@ export async function seedCategories() {
   await db
     .insert(settings)
     .values({ key: "openrouter_model", value: "deepseek/deepseek-chat" })
+    .onConflictDoNothing();
+
+  await db
+    .insert(settings)
+    .values({ key: "openai_model", value: "gpt-4o-mini" })
+    .onConflictDoNothing();
+
+  await db
+    .insert(settings)
+    .values({ key: "anthropic_model", value: "claude-3-5-haiku-20241022" })
     .onConflictDoNothing();
 
   await db
