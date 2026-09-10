@@ -72,3 +72,32 @@ export async function extractOcrWithOpenRouter(
     return "";
   }
 }
+
+export async function extractOcrWithOpenAI(
+  imageUrl: string,
+  apiKey: string,
+  model: string = "gpt-4o-mini"
+): Promise<string> {
+  try {
+    const client = new OpenAI({ apiKey });
+
+    const completion = await client.chat.completions.create({
+      model: model || "gpt-4o-mini",
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: buildVisionPrompt() },
+            { type: "image_url", image_url: { url: imageUrl } },
+          ],
+        },
+      ],
+      temperature: 0.1,
+    });
+
+    return (completion.choices[0]?.message?.content || "").trim();
+  } catch (err) {
+    console.warn("[openai-ocr] Failed to extract OCR:", err);
+    return "";
+  }
+}
