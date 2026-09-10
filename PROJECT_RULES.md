@@ -1,6 +1,6 @@
 # Project-Specific AI Engineering Rules
 
-**Document:** `PROJECT_RULES.md` · **Version:** `1.3.0`
+**Document:** `PROJECT_RULES.md` · **Version:** `1.4.0`
 
 > `UNIVERSAL_RULES.md` defines **how the agent works**. This file defines **what the agent should work with in this project**.
 
@@ -16,9 +16,9 @@
 
 ### Discovery Metadata
 
-- **Last Discovered:** 2026-09-11 00:36
+- **Last Discovered:** 2026-09-11 01:05
 - **Discovered By:** Antigravity AI Agent
-- **Revision:** `01837e6`
+- **Revision:** `fe150d7`
 - **Status:** `VERIFIED`
 
 ## 2. Technology Stack
@@ -81,8 +81,9 @@ MindMark X
 │   └── sidebar.tsx          # Navigation sidebar with real-time stats badge
 ├── lib/                     # Core business logic & services
 │   ├── ai/                  # AI orchestrator, prompts, sanitizer & providers
+│   │   ├── anthropic.ts     # Official Anthropic Claude SDK client and Vision OCR
 │   │   ├── gemini.ts        # Google Gemini text & Vision OCR integration
-│   │   ├── openai-compat.ts # DeepSeek & OpenRouter OpenAI-compatible client
+│   │   ├── openai-compat.ts # OpenAI, DeepSeek & OpenRouter client and Vision OCR
 │   │   ├── pipeline.ts      # Concurrency-controlled background batch processor
 │   │   ├── prompts.ts       # Turkish-enforced system and analysis prompts
 │   │   ├── sanitizer.ts     # DeepSeek <think> tag stripper and dual-key resolver
@@ -121,13 +122,13 @@ Client components communicate with SQLite via Next.js REST API endpoints or serv
 
 - **Error Model:** Explicit HTTP status codes (`NextResponse.json({ error }, { status })`), try/catch blocks with fallback values
 - **User-facing Handling:** Alert modals, error banners, badge states (`aiStatus`: `pending` | `processing` | `success` | `failed` with manual retry)
-- **Logging:** Prefixed console logs (`[pipeline]`, `[sanitizer]`, `[gemini-ocr]`, `[openrouter-ocr]`, `[api/*]`)
+- **Logging:** Prefixed console logs (`[pipeline]`, `[sanitizer]`, `[gemini-ocr]`, `[openai-ocr]`, `[anthropic-ocr]`, `[openrouter-ocr]`, `[api/*]`)
 
 ### 3.7 Authentication / Authorization
 
 - **Authentication:** None (Single-user local environment on localhost)
 - **Authorization:** Unrestricted local access
-- **Session / Token:** API keys (Gemini, DeepSeek, OpenRouter) stored locally in SQLite `settings` table
+- **Session / Token:** API keys (Gemini, OpenAI, Anthropic, DeepSeek, OpenRouter) stored locally in SQLite `settings` table
 - **Source:** `lib/db/schema.ts`, `app/settings/page.tsx`
 - **Status:** `VERIFIED`
 
@@ -190,6 +191,8 @@ Do not change an established design system without the approval required by `UNI
 - **Error Mapping:** JSON `{ error: string }` with HTTP status codes (400 for bad payloads, 500 for server exceptions).
 - **External Services:**
   - Google Gemini API (`@google/genai`, default model `gemini-2.5-flash`) for categorization and Vision OCR
+  - OpenAI API (`https://api.openai.com/v1`, default model `gpt-4o-mini`) via official OpenAI SDK for categorization and Vision OCR
+  - Anthropic Claude API (`https://api.anthropic.com`, default model `claude-3-5-haiku-20241022`) via official `@anthropic-ai/sdk` for categorization and Vision OCR
   - DeepSeek API (`https://api.deepseek.com`, model `deepseek-chat`) via OpenAI SDK
   - OpenRouter API (`https://openrouter.ai/api/v1`, model `deepseek/deepseek-chat`) via OpenAI SDK
   - Twitter / X Media CDN (`pbs.twimg.com`, `ton.twimg.com`) configured in `next.config.ts`
@@ -209,7 +212,7 @@ Never record credentials or secrets here.
 
 ## 10. Environment / Secrets
 
-- **Environment Files:** None committed; environment variables optionally read from environment (`GOOGLE_API_KEY`, `DEEPSEEK_API_KEY`, `OPENROUTER_API_KEY`).
+- **Environment Files:** None committed; environment variables optionally read from environment (`GOOGLE_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `DEEPSEEK_API_KEY`, `OPENROUTER_API_KEY`).
 - **Secret Provider:** Local SQLite `settings` table (`sqlite.db` key-value store edited via `/settings` UI).
 - **Local Setup:** Enter API keys in the `/settings` web UI; saved locally in SQLite.
 - **Production Secret Handling:** Never commit secrets, API keys, or database credentials.
@@ -251,7 +254,8 @@ May add project requirements; may not weaken universal branch/merge rules.
 | AI Sanitizer | `lib/ai/sanitizer.ts` | DeepSeek `<think>` block stripper and dual-key slug matcher |
 | AI Prompts | `lib/ai/prompts.ts` | Turkish summary enforcement and system/user prompts |
 | Gemini Client | `lib/ai/gemini.ts` | Google GenAI SDK integration and Vision OCR |
-| OpenAI-compat Client | `lib/ai/openai-compat.ts` | DeepSeek and OpenRouter client integrations |
+| OpenAI-compat Client | `lib/ai/openai-compat.ts` | OpenAI, DeepSeek and OpenRouter client integrations with Vision OCR |
+| Anthropic Client | `lib/ai/anthropic.ts` | Official Anthropic Claude SDK integration with Vision OCR |
 | Database Schema | `lib/db/schema.ts` | Drizzle ORM definitions for SQLite tables |
 | Database Client | `lib/db/index.ts` | LibSQL SQLite client connection |
 | Database Seed | `lib/db/seed.ts` | Default taxonomy and initial configuration seed script |

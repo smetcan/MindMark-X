@@ -15,7 +15,7 @@
 
 **MindMark-X**, Twitter/X üzerinde kaydettiğiniz yüzlerce veya binlerce yer imini (bookmarks) kaybolmaktan kurtaran, kendi bilgisayarınızda (**self-hosted**) çalışan modern bir bilgi yönetim sistemidir.
 
-Resmi Twitter API'sine veya ücretli aboneliklere ihtiyaç duymadan, tarayıcınıza ekleyeceğiniz **Bookmarklet** veya dosya yükleme aracılığıyla yer imlerinizi tek tıkla yerel veritabanınıza aktarır. Ardından **Google Gemini**, **DeepSeek** veya **OpenRouter** yapay zeka modelleriyle tweetleri otomatik olarak kategorize eder, etiketler ve **kaynak dil ne olursa olsun Türkçe özetini** çıkarır. Tüm bu bilgi havuzunu etkileşimli bir **zihin haritası (mindmap)** tuvalinde görselleştirir.
+Resmi Twitter API'sine veya ücretli aboneliklere ihtiyaç duymadan, tarayıcınıza ekleyeceğiniz **Bookmarklet** veya dosya yükleme aracılığıyla yer imlerinizi tek tıkla yerel veritabanınıza aktarır. Ardından **Google Gemini**, **OpenAI**, **Anthropic Claude**, **DeepSeek** veya **OpenRouter** yapay zeka modelleriyle tweetleri otomatik olarak kategorize eder, etiketler ve **kaynak dil ne olursa olsun Türkçe özetini** çıkarır. Tüm bu bilgi havuzunu etkileşimli bir **zihin haritası (mindmap)** tuvalinde görselleştirir.
 
 ---
 
@@ -28,7 +28,7 @@ Resmi Twitter API'sine veya ücretli aboneliklere ihtiyaç duymadan, tarayıcın
 * **Akıllı Mükerrer Önleme (Deduplication):** Aynı tweet birden fazla kez içeri aktarılsa dahi benzersiz `tweet_id` ile mükerrer kayıtlar otomatik filtrelenir.
 
 ### 2. 🧠 Yapay Zeka & Türkçe Bilgi Küratörlüğü
-* **Çoklu Sağlayıcı:** Google Gemini (`gemini-2.5-flash`), DeepSeek (`deepseek-chat`) ve OpenRouter (`deepseek/deepseek-chat` vb.) arasında anında geçiş.
+* **Çoklu Sağlayıcı:** Google Gemini (`gemini-2.5-flash`), OpenAI (`gpt-4o-mini`), Anthropic Claude (`claude-3-5-haiku-20241022`), DeepSeek (`deepseek-chat`) ve OpenRouter (`deepseek/deepseek-chat` vb.) arasında anında geçiş.
 * **Zorunlu Türkçe Özet Kuralı:** Tweet İngilizce, Japonca veya başka bir dilde olsa dahi yapay zeka özet alanı **kesinlikle akıcı Türkçe** olarak üretilir.
 * **Görsel Analizi & OCR (Vision):** Tweet görsel içeriyorsa (kod ekran görüntüleri, infografikler, makale başlıkları), OCR teknolojisiyle görseldeki metinler okunur ve analize dahil edilir.
 * **Dayanıklı Çıktı Temizleyici (Sanitizer):** DeepSeek-R1 modellerinin `<think>` düşünce bloklarını ve markdown artıklarını temizler; model kategori adı yerine slug döndürse bile çift anahtarlı (*dual-key*) eşleme ile doğru kategoriye bağlar.
@@ -100,7 +100,7 @@ Tarayıcınızda [http://localhost:3000](http://localhost:3000) adresini açın.
 
 ### 1. API Anahtarlarını Tanımlama
 Uygulamayı açtıktan sonra sol menüden **Ayarlar** (`/settings`) sayfasına gidin:
-1. Kullanmak istediğiniz sağlayıcıyı seçin (**Google Gemini**, **DeepSeek** veya **OpenRouter**).
+1. Kullanmak istediğiniz sağlayıcıyı seçin (**Google Gemini**, **OpenAI**, **Anthropic Claude**, **DeepSeek** veya **OpenRouter**).
 2. İlgili sağlayıcıya ait API anahtarınızı girin ve **Ayarları Kaydet** butonuna basın.
 3. İsteğe bağlı olarak **Görsel Analizi & OCR** seçeneğini aktif bırakın.
 
@@ -154,8 +154,9 @@ MindMark-X/
 │   └── sidebar.tsx          # Navigasyon çubuğu ve canlı istatistik kartı
 ├── lib/                     # Çekirdek iş mantığı ve yardımcı modüller
 │   ├── ai/                  # AI motorları, promptlar, sanitizer ve pipeline
+│   │   ├── anthropic.ts     # Resmi Anthropic Claude SDK istemcisi ve Vision OCR
 │   │   ├── gemini.ts        # Google Gemini metin & Vision OCR istemcisi
-│   │   ├── openai-compat.ts # DeepSeek & OpenRouter OpenAI-uyumlu istemci
+│   │   ├── openai-compat.ts # OpenAI, DeepSeek & OpenRouter istemcisi ve Vision OCR
 │   │   ├── pipeline.ts      # 3 kanallı asenkron arka plan analiz yürütücüsü
 │   │   ├── prompts.ts       # Türkçe özet zorunlu sistem promptları
 │   │   ├── sanitizer.ts     # DeepSeek <think> temizleyici & dual-key slug eşleyici
