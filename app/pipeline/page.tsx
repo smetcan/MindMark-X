@@ -83,9 +83,26 @@ export default function PipelinePage() {
   const activeModel =
     activeProvider === "google"
       ? settings.google_model || "gemini-2.5-flash"
+      : activeProvider === "openai"
+      ? settings.openai_model || "gpt-4o-mini"
+      : activeProvider === "anthropic"
+      ? settings.anthropic_model || "claude-3-5-haiku-20241022"
       : activeProvider === "deepseek"
       ? settings.deepseek_model || "deepseek-chat"
       : settings.openrouter_model || "deepseek/deepseek-chat";
+
+  const providerName =
+    activeProvider === "google"
+      ? "Google Gemini"
+      : activeProvider === "openai"
+      ? "OpenAI"
+      : activeProvider === "anthropic"
+      ? "Anthropic Claude"
+      : activeProvider === "deepseek"
+      ? "DeepSeek"
+      : activeProvider === "openrouter"
+      ? "OpenRouter"
+      : activeProvider;
 
   return (
     <div className="p-8 max-w-4xl mx-auto w-full">
@@ -104,8 +121,8 @@ export default function PipelinePage() {
       <div className="p-5 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between mb-6">
         <div>
           <span className="text-xs font-semibold text-blue-400 uppercase tracking-wider">Aktif Yapay Zeka Motoru</span>
-          <h2 className="text-base font-bold text-zinc-100 capitalize mt-0.5">
-            {activeProvider} ({activeModel})
+          <h2 className="text-base font-bold text-zinc-100 mt-0.5">
+            {providerName} ({activeModel})
           </h2>
         </div>
         <Link

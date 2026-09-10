@@ -15,6 +15,10 @@ export default function SettingsPage() {
     active_provider: "google",
     google_api_key: "",
     google_model: "gemini-2.5-flash",
+    openai_api_key: "",
+    openai_model: "gpt-4o-mini",
+    anthropic_api_key: "",
+    anthropic_model: "claude-3-5-haiku-20241022",
     deepseek_api_key: "",
     deepseek_model: "deepseek-chat",
     openrouter_api_key: "",
@@ -120,9 +124,11 @@ export default function SettingsPage() {
           <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
             Aktif Sağlayıcı
           </label>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {[
               { id: "google", name: "Google Gemini", sub: "Ücretsiz kota, hızlı Vision OCR" },
+              { id: "openai", name: "OpenAI", sub: "api.openai.com (GPT-4o, GPT-4o-mini)" },
+              { id: "anthropic", name: "Anthropic Claude", sub: "api.anthropic.com (Claude 3.5 Haiku/Sonnet)" },
               { id: "deepseek", name: "DeepSeek", sub: "api.deepseek.com" },
               { id: "openrouter", name: "OpenRouter", sub: "openrouter.ai (Çoklu model)" },
             ].map((p) => {
@@ -169,6 +175,58 @@ export default function SettingsPage() {
                 type="text"
                 value={settings.google_model || "gemini-2.5-flash"}
                 onChange={(e) => setSettings({ ...settings, google_model: e.target.value })}
+                className="w-full px-3.5 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-200 focus:outline-none focus:border-blue-500/60"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* OpenAI Credentials */}
+        <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80 space-y-3">
+          <span className="font-semibold text-sm text-zinc-200">OpenAI Ayarları</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-zinc-400 mb-1">OpenAI API Key</label>
+              <input
+                type="password"
+                value={settings.openai_api_key || ""}
+                onChange={(e) => setSettings({ ...settings, openai_api_key: e.target.value })}
+                placeholder="sk-proj-..."
+                className="w-full px-3.5 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-200 focus:outline-none focus:border-blue-500/60"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-zinc-400 mb-1">Model</label>
+              <input
+                type="text"
+                value={settings.openai_model || "gpt-4o-mini"}
+                onChange={(e) => setSettings({ ...settings, openai_model: e.target.value })}
+                className="w-full px-3.5 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-200 focus:outline-none focus:border-blue-500/60"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Anthropic Claude Credentials */}
+        <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80 space-y-3">
+          <span className="font-semibold text-sm text-zinc-200">Anthropic Claude Ayarları</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-zinc-400 mb-1">Anthropic API Key</label>
+              <input
+                type="password"
+                value={settings.anthropic_api_key || ""}
+                onChange={(e) => setSettings({ ...settings, anthropic_api_key: e.target.value })}
+                placeholder="sk-ant-..."
+                className="w-full px-3.5 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-200 focus:outline-none focus:border-blue-500/60"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-zinc-400 mb-1">Model</label>
+              <input
+                type="text"
+                value={settings.anthropic_model || "claude-3-5-haiku-20241022"}
+                onChange={(e) => setSettings({ ...settings, anthropic_model: e.target.value })}
                 className="w-full px-3.5 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-200 focus:outline-none focus:border-blue-500/60"
               />
             </div>
