@@ -1,3 +1,27 @@
+## 2026-09-11 00:54 — AI Sağlayıcı Tipleri Genişletildi ve Varsayılan Modeller Tohumlandı
+
+- **Type:** `Feature`
+- **Status:** `Completed`
+- **Branch:** `main`
+- **Commit:** `ca4fd03`
+- **Developer:** `AI Agent`
+- **Scope:** `AI Modülleri & Veritabanı`
+
+### Summary
+`AIProviderType` union tipine 'openai' ve 'anthropic' sağlayıcıları eklendi. Veritabanı tohumlama betiğinde (`lib/db/seed.ts`) OpenAI (`gpt-4o-mini`) ve Anthropic (`claude-3-5-haiku-20241022`) için varsayılan model ayarları tanımlandı.
+
+### Changes
+- `lib/ai/types.ts` dosyasında `AIProviderType` tipi "openai" ve "anthropic" içerecek şekilde genişletildi.
+- `lib/db/seed.ts` dosyasına `openai_model` ve `anthropic_model` için varsayılan tohumlama kayıtları eklendi.
+
+### Validation
+- `npx tsx lib/db/seed.ts` — `PASS`
+- `npx tsc --noEmit` — `PASS`
+- `npx tsx test/verify.ts` — `PASS`
+
+### Notes
+Seed betiği başarıyla çalıştırıldı ve veritabanı ayarları güncellendi.
+
 ## 2026-09-11 00:40 — Kapsamlı Proje Dokümantasyonu (README.md) Hazırlandı
 
 - **Type:** `Docs`
