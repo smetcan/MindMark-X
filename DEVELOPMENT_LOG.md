@@ -1,3 +1,27 @@
+## 2026-09-11 01:02 — Pipeline Yöneticisine OpenAI ve Anthropic Entegrasyonu Yapıldı
+
+- **Type:** `Feature`
+- **Status:** `Completed`
+- **Branch:** `main`
+- **Commit:** `516afad`
+- **Developer:** `AI Agent`
+- **Scope:** `AI Modülleri & Pipeline`
+
+### Summary
+Arka plan analiz yöneticisi (`lib/ai/pipeline.ts`), OpenAI ve Anthropic sağlayıcılarını destekleyecek şekilde güncellendi. API anahtarı yükleme ve doğrulama, Vision OCR çıkarımı ve kategori/etiketleme adımlarına OpenAI (`gpt-4o-mini`) ve Anthropic (`claude-3-5-haiku-20241022`) dalları eklendi.
+
+### Changes
+- `lib/ai/pipeline.ts` dosyasına `analyzeWithAnthropic`, `extractOcrWithAnthropic` ve `extractOcrWithOpenAI` fonksiyonları import edildi.
+- Ayarlar tablosu ve ortam değişkenlerinden `openaiKey` ile `anthropicKey` değerlerinin okunması ve sağlayıcı aktifken eksik anahtar validasyonu eklendi.
+- Çoklu işçi havuzunda Vision OCR ve analiz/sınıflandırma aşamalarında `openai` ve `anthropic` sağlayıcı dalları bağlandı.
+
+### Validation
+- `npx tsc --noEmit` — `PASS`
+- `npx tsx test/verify.ts` — `PASS`
+
+### Notes
+Tüm TypeScript tip denetimleri ve uçtan uca otomatik doğrulama testleri başarıyla geçti.
+
 ## 2026-09-11 00:59 — OpenAI Vision OCR Yeteneği Eklendi
 
 - **Type:** `Feature`
