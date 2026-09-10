@@ -1,3 +1,29 @@
+## 2026-09-11 01:05 — Ayarlar ve Pipeline Kullanıcı Arayüzüne OpenAI ve Anthropic Desteği Eklendi
+
+- **Type:** `Feature`
+- **Status:** `Completed`
+- **Branch:** `main`
+- **Commit:** `e0f8815`
+- **Developer:** `AI Agent`
+- **Scope:** `Kullanıcı Arayüzü (Ayarlar & Pipeline)`
+
+### Summary
+Ayarlar (`app/settings/page.tsx`) ve Pipeline (`app/pipeline/page.tsx`) sayfaları OpenAI ve Anthropic Claude sağlayıcılarını destekleyecek şekilde güncellendi. Kullanıcı arayüzünde aktif sağlayıcı seçim kartları, API anahtarı ve model yapılandırma panelleri ile aktif motor göstergeleri eklendi.
+
+### Changes
+- `app/settings/page.tsx` bileşenine varsayılan OpenAI ve Anthropic API anahtarı ile model state değerleri eklendi.
+- Ayarlar sayfasındaki aktif sağlayıcı seçim kartları grid yapısı genişletilerek Google, OpenAI, Anthropic, DeepSeek ve OpenRouter olmak üzere 5 sağlayıcıyı barındıracak şekilde güncellendi.
+- OpenAI (`openai_api_key`, `openai_model`) ve Anthropic (`anthropic_api_key`, `anthropic_model`) için kimlik bilgisi ve model yapılandırma kartları eklendi.
+- `app/pipeline/page.tsx` bileşeninde `activeModel` hesaplamasına `openai` ve `anthropic` koşulları eklendi ve sağlayıcı etiket formatlaması güncellendi.
+
+### Validation
+- `npx tsc --noEmit` — `PASS`
+- `npx tsx test/verify.ts` — `PASS`
+- `npm run build` — `PASS`
+
+### Notes
+Tüm kontroller ve derleme adımları sıfır hata ile başarıyla tamamlandı.
+
 ## 2026-09-11 01:02 — Pipeline Yöneticisine OpenAI ve Anthropic Entegrasyonu Yapıldı
 
 - **Type:** `Feature`
