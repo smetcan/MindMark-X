@@ -1,3 +1,27 @@
+## 2026-09-11 00:59 — OpenAI Vision OCR Yeteneği Eklendi
+
+- **Type:** `Feature`
+- **Status:** `Completed`
+- **Branch:** `main`
+- **Commit:** `5010d57`
+- **Developer:** `AI Agent`
+- **Scope:** `AI Modülleri`
+
+### Summary
+OpenAI modelleri (`gpt-4o-mini`) ile görseller üzerinden metin ve OCR çıkarma işlemi gerçekleştiren `extractOcrWithOpenAI` fonksiyonu `lib/ai/openai-compat.ts` modülüne eklendi.
+
+### Changes
+- `lib/ai/openai-compat.ts` dosyasına `extractOcrWithOpenAI` fonksiyonu eklendi ve dışa aktarıldı.
+- Görseller çok modlu (multimodal `image_url`) mesaj biçiminde OpenAI Chat Completions API'sine gönderildi.
+- Hata durumları `try/catch` ve fallback ile güvenli hale getirildi.
+
+### Validation
+- `npx tsc --noEmit` — `PASS`
+- `npx tsx test/verify.ts` — `PASS`
+
+### Notes
+OpenAI Vision OCR fonksiyonu ve TypeScript tip uyumluluğu doğrulandı.
+
 ## 2026-09-11 00:57 — Anthropic İstemci Modülü Geliştirildi
 
 - **Type:** `Feature`
