@@ -38,7 +38,7 @@
 | Build | Next.js Build (`next build`), PostCSS (`^8.5.3`) | N/A | `package.json`, `postcss.config.mjs` | `VERIFIED` |
 | CI/CD | None | N/A | Repository inspection | `OBSERVED` |
 | Hosting | Localhost (`http://localhost:3000`) | Node.js `v24.20.0` | `components/sidebar.tsx`, `lib/import/bookmarklet.ts` | `OBSERVED` |
-| AI Engines | `@google/genai` (`^2.21.0`), `openai` (`^4.85.4`) | `^2.21.0` / `^4.85.4` | `package.json`, `lib/ai/` | `VERIFIED` |
+| AI Engines | `@google/genai` (`^2.21.0`), `openai` (`^4.85.4`), `@anthropic-ai/sdk` (`^0.125.0`) | `^2.21.0` / `^4.85.4` / `^0.125.0` | `package.json`, `lib/ai/` | `VERIFIED` |
 
 Record only evidence-backed facts or explicit decisions.
 
@@ -256,7 +256,7 @@ May add project requirements; may not weaken universal branch/merge rules.
 | Database Client | `lib/db/index.ts` | LibSQL SQLite client connection |
 | Database Seed | `lib/db/seed.ts` | Default taxonomy and initial configuration seed script |
 | Bookmark Parser | `lib/import/parser.ts` | Normalizer for Twitter archive, Siftly and bookmarklet JSON |
-| Bookmarklet Script | `lib/import/bookmarklet.ts` | In-browser DOM scraper script for x.com/i/bookmarks |
+| Bookmarklet Script | `lib/import/bookmarklet.ts` | In-browser DOM scraper script for x.com/i/history (or x.com/i/bookmarks) |
 | Next.js Config | `next.config.ts` | Server actions body limit and image remote patterns |
 | TypeScript Config | `tsconfig.json` | Strict TypeScript compiler options |
 | Drizzle Config | `drizzle.config.ts` | Drizzle Kit SQLite configuration |

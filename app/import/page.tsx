@@ -274,15 +274,16 @@ export default function ImportPage() {
             <ol className="space-y-2 text-xs text-zinc-400 list-decimal list-inside leading-relaxed">
               <li>Yukarıdaki iki yöntemden biriyle butonu tarayıcınızın yer imleri çubuğuna ekleyin.</li>
               <li>
-                X'te yer imlerinize gidin:{" "}
+                X'te yer imlerinize (geçmişinize) gidin:{" "}
                 <a
-                  href="https://x.com/i/bookmarks"
+                  href="https://x.com/i/history"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 underline font-medium"
                 >
-                  x.com/i/bookmarks <ExternalLink size={12} />
-                </a>
+                  x.com/i/history <ExternalLink size={12} />
+                </a>{" "}
+                <span className="text-zinc-500">(veya eski arayüzde x.com/i/bookmarks)</span>
               </li>
               <li>Sayfa açıkken yer imleri çubuğundaki <strong>🔖 X Bookmarks Aktar</strong> butonuna tıklayın.</li>
               <li>Sayfanın sağ altında açılan panelden <strong>"▶ Otomatik Kaydır"</strong> butonuna basın (veya sayfayı kendiniz fareyle aşağı kaydırın; sayaç her yeni tweette otomatik artacaktır).</li>
@@ -307,7 +308,7 @@ export default function ImportPage() {
             <div>
               <h3 className="text-base font-semibold text-zinc-100 mb-1">Geliştirici Konsolu Betiği</h3>
               <p className="text-xs text-zinc-400">
-                x.com/i/bookmarks sayfasında F12 konsoluna yapıştırarak aynı işlemi çalıştırabilirsiniz.
+                x.com/i/history (veya x.com/i/bookmarks) sayfasında F12 konsoluna yapıştırarak aynı işlemi çalıştırabilirsiniz.
               </p>
             </div>
             <button

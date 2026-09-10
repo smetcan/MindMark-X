@@ -22,7 +22,7 @@ Resmi Twitter API'sine veya ücretli aboneliklere ihtiyaç duymadan, tarayıcın
 ## ✨ Öne Çıkan Özellikler
 
 ### 1. 📥 Zahmetsiz İçe Aktarma (Ingestion)
-* **Tarayıcı Bookmarklet (Önerilen):** `x.com/i/bookmarks` sayfasında tek tıkla çalışan mini panel. Otomatik sayfa kaydırma, canlı toplanan tweet sayacı ve doğrudan yerel sunucuya (`localhost:3000`) aktarma veya tek tıkla `JSON İndir` seçeneği.
+* **Tarayıcı Bookmarklet (Önerilen):** `x.com/i/history` (veya `x.com/i/bookmarks`) sayfasında tek tıkla çalışan mini panel. Otomatik sayfa kaydırma, canlı toplanan tweet sayacı ve doğrudan yerel sunucuya (`localhost:3000`) aktarma veya tek tıkla `JSON İndir` seçeneği.
 * **Dosya Yükleme (Dropzone):** Twitter Arşiv dosyaları (`bookmarks.js`, `like.js`), Siftly `bookmarks.json` veya standart JSON exportlarını sürükle-bırak desteği.
 * **Geliştirici Konsolu Betiği:** Tarayıcı konsoluna (F12) yapıştırıp çalıştırabileceğiniz açık kaynaklı betik desteği.
 * **Akıllı Mükerrer Önleme (Deduplication):** Aynı tweet birden fazla kez içeri aktarılsa dahi benzersiz `tweet_id` ile mükerrer kayıtlar otomatik filtrelenir.
@@ -60,7 +60,7 @@ Resmi Twitter API'sine veya ücretli aboneliklere ihtiyaç duymadan, tarayıcın
 | **İkon Seti** | Lucide React | Modern arayüz ikonları |
 | **Veritabanı** | SQLite (`@libsql/client`) | Dosya tabanlı yerel ilişkisel veritabanı |
 | **ORM** | Drizzle ORM & Drizzle Kit | Şema tanımları, migrasyonlar ve tohumlama |
-| **AI SDK'ları** | `@google/genai` & `openai` | Gemini API ve OpenAI-uyumlu DeepSeek/OpenRouter |
+| **AI SDK'ları** | `@google/genai`, `openai` & `@anthropic-ai/sdk` | Gemini API, OpenAI-uyumlu DeepSeek/OpenRouter ve Anthropic Claude |
 
 ---
 
@@ -106,7 +106,7 @@ Uygulamayı açtıktan sonra sol menüden **Ayarlar** (`/settings`) sayfasına g
 
 ### 2. X Yer İmlerini İçe Aktarma
 Sol menüden **İçe Aktar** (`/import`) sayfasına gidin:
-* **Yöntem A (Bookmarklet):** `🔖 X Bookmarks Aktar` butonunu tarayıcınızın Yer İmleri (Favoriler) çubuğuna sürükleyin. [x.com/i/bookmarks](https://x.com/i/bookmarks) adresindeyken butona tıklayın; sayfanın sağ altında açılan panelden **Otomatik Kaydır**'ı başlatın ve ardından **JSON İndir** veya doğrudan **Aktar** butonuna basın.
+* **Yöntem A (Bookmarklet):** `🔖 X Bookmarks Aktar` butonunu tarayıcınızın Yer İmleri (Favoriler) çubuğuna sürükleyin. [x.com/i/history](https://x.com/i/history) (veya [x.com/i/bookmarks](https://x.com/i/bookmarks)) adresindeyken butona tıklayın; sayfanın sağ altında açılan panelden **Otomatik Kaydır**'ı başlatın ve ardından **JSON İndir** veya doğrudan **Aktar** butonuna basın.
 * **Yöntem B (Dosya Yükleme):** Varsa Twitter arşiv dosyanızı veya indirdiğiniz `x_bookmarks.json` dosyasını sürükleyip yükleme alanına bırakın.
 
 ### 3. Yapay Zeka Analizini Başlatma
