@@ -48,3 +48,6 @@ Thumbs.db
 # Temporary & Cache directories
 tmp/
 temp/
+
+# Superpowers local run state & task ledgers
+.superpowers/
