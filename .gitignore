@@ -51,3 +51,8 @@ temp/
 
 # Superpowers local run state & task ledgers
 .superpowers/
+
+# Hermes export artifacts & raw tweets input
+export_hermes/
+tweets.js
+*.js.download

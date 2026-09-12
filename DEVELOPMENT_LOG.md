@@ -1,3 +1,28 @@
+## 2026-09-13 00:54 — Hermes Yapay Zeka Eğitimi İçin Tweet Arşivi Dönüştürücü Betiği Eklendi
+
+- **Type:** `Feature`
+- **Status:** `Completed`
+- **Branch:** `main`
+- **Commit:** `d98f78f`
+- **Developer:** `AI Agent`
+- **Scope:** `Veri İşleme & CLI Betikleri`
+
+### Summary
+Twitter veri arşivindeki `tweets.js` dosyasından kullanıcının kendi paylaştığı tweetleri ve flood zincirlerini ayıklayan, gürültü ve retweetleri temizleyip Hermes ajanını eğitmek için ChatML JSONL ve Markdown külliyatı üreten CLI betiği eklendi.
+
+### Changes
+- `scripts/export-hermes-dataset.ts` dosyası oluşturuldu; retweet ve kısa mention yanıtı filtreleme, kronolojik flood/thread birleştirme, URL/HTML temizliği ve 3 formatta çıktı üretimi (Markdown, ChatML JSONL, Raw text JSONL) kodlandı.
+- `package.json` dosyasına `export:hermes` betiği tanımlandı.
+- `.gitignore` dosyasına `export_hermes/` ve `tweets.js` girdileri eklenerek kullanıcı verilerinin depoya gitmesi engellendi.
+- `PROJECT_RULES.md` dosyası yeni betik ve komut ile senkronize edildi.
+
+### Validation
+- `npx tsc --noEmit` — `PASS`
+- `npx tsx test/verify.ts` — `PASS`
+
+### Notes
+Kullanıcı dosyaları işlendikten sonra test verileri ve geçici çıktılar güvenle temizlendi, betik kalıcı hale getirildi.
+
 ## 2026-09-11 01:10 — OpenAI ve Anthropic Entegrasyonu Dokümantasyonu ve Proje Kuralları Güncellendi
 
 - **Type:** `Docs`
