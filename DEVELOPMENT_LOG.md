@@ -1,3 +1,34 @@
+## 2026-09-13 23:48 — Bookmarklet Ön Bellek ve CSP Yarış Durumu Düzeltildi, Pano Aktarımı Eklendi
+
+- **Type:** `Bugfix`
+- **Status:** `Completed`
+- **Branch:** `main`
+- **Commit:** `585fe47`
+- **Developer:** `AI Agent`
+- **Scope:** `İçe Aktarma & Bookmarklet UX`
+
+### Summary
+Bookmarklet'in X.com Content Security Policy (connect-src) engeli sebebiyle `http://localhost:3000` erişim hatası alması sonucu `catch` bloğunun gerçek zamanlı yakalanan yeni tweet durumunu ezmesi (race condition) giderildi. Sayı ve durum metinleri kullanıcıyı yanıltmayacak şekilde yeniden tasarlandı ("Yeni Yer İmi" vs. "Durdurma Referansı"). Bookmarklet'e tek tıkla panoya kopyalama (`📋 Panoya Kopyala`), MindMark X arayüzüne ise panodan tek tıkla içeri alma (`📋 Panodan Yapıştır & Aktar`) eklendi.
+
+### Changes
+- `lib/import/bookmarklet.ts`:
+  - X.com CSP engeline takılan asenkron `fetch("http://localhost:3000/...")` çağrısı ve durum ezilmesine yol açan catch bloğu kaldırıldı.
+  - Ön bellek terminolojisi düzeltildi: Durdurma hafızası ("Durdurma hafızası: N eski tweet") ile sayfada bulunan yeni tweetler ("N Yeni") birbirinden net olarak ayrıldı.
+  - Sayfa açıldığı anda görünen yeni tweetler ve ilk eski tweete denk gelme durumu 100ms içinde tespit edilerek yeşil başarı mesajı (`🎯 N YENİ tweet yakalandı!`) üretilmesi sağlandı.
+  - `📋 Panoya Kopyala` ve `🔄 Hafızayı Sıfırla` butonları eklendi.
+  - `getBookmarkletHref` fonksiyonuna veritabanındaki son tweet ID'lerini bookmarklet içine önceden gömme desteği eklendi.
+- `app/import/page.tsx`:
+  - Sayfa açılışında veritabanındaki son tweet ID'lerini çekip bookmarklet bağlantısına enjekte etme mekanizması eklendi.
+  - Dosya sekmesine `📋 Panodan Yapıştır & Aktar` butonu eklenerek kullanıcıya dosya indirmeden 2 saniyede yeni yer imlerini aktarma yeteneği kazandırıldı.
+
+### Validation
+- `npx tsc --noEmit` — `PASS`
+- `npx tsx test/verify.ts` — `PASS`
+- `npm run build` — `PASS` (13 rota başarıyla derlendi)
+
+### Notes
+Kullanıcı artık X üzerinde "Panoya Kopyala" deyip MindMark X'te "Panodan Yapıştır" diyerek sıfır dosya trafiği ile aktarım yapabilir.
+
 ## 2026-09-13 23:42 — Akıllı Artımlı İçe Aktarma (Bookmarklet Auto-Stop) Desteği Eklendi
 
 - **Type:** `Feature`

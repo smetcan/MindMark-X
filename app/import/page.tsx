@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Upload, FileJson, CheckCircle2, Bookmark, Terminal, Copy, Check, ArrowRight, ExternalLink } from "lucide-react";
+import { Upload, FileJson, CheckCircle2, Bookmark, Terminal, Copy, Check, ArrowRight, ExternalLink, ClipboardPaste } from "lucide-react";
 import { getBookmarkletHref, BOOKMARKLET_RAW_SCRIPT } from "@/lib/import/bookmarklet";
 import Link from "next/link";
 
@@ -12,9 +12,27 @@ export default function ImportPage() {
   const [uploadResult, setUploadResult] = useState<{ imported: number; skipped: number; total: number } | null>(null);
   const [copied, setCopied] = useState(false);
   const [bmCopied, setBmCopied] = useState(false);
+  const [recentIds, setRecentIds] = useState<string[]>([]);
 
   const bookmarkletRef = useRef<HTMLAnchorElement>(null);
-  const bookmarkletHref = getBookmarkletHref();
+
+  const fetchRecentIds = async () => {
+    try {
+      const res = await fetch("/api/import");
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.recentIds)) {
+          setRecentIds(data.recentIds);
+        }
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    fetchRecentIds();
+  }, []);
+
+  const bookmarkletHref = getBookmarkletHref(recentIds);
 
   useEffect(() => {
     if (bookmarkletRef.current) {
@@ -59,9 +77,49 @@ export default function ImportPage() {
         alert(resJson.error || "İçe aktarma başarısız oldu.");
       } else {
         setUploadResult(resJson);
+        fetchRecentIds();
       }
     } catch (err) {
       alert("Dosya okuma veya JSON parse hatası: " + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handlePasteFromClipboard = async () => {
+    setUploading(true);
+    setUploadResult(null);
+
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text || !text.trim()) {
+        alert("Panoda kopyalanmış veri bulunamadı! Lütfen X üzerinde bookmarklet'ten '📋 Panoya Kopyala' butonuna basın.");
+        return;
+      }
+
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        alert("Panodaki içerik geçerli bir tweet JSON listesi değil. Lütfen bookmarklet'ten '📋 Panoya Kopyala' butonunu kullandığınızdan emin olun.");
+        return;
+      }
+
+      const res = await fetch("/api/import?autoStart=false", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const resJson = await res.json();
+      if (!res.ok) {
+        alert(resJson.error || "İçe aktarma başarısız oldu.");
+      } else {
+        setUploadResult(resJson);
+        fetchRecentIds();
+      }
+    } catch (err) {
+      alert("Panodan okuma hatası: " + (err instanceof Error ? err.message : String(err)));
     } finally {
       setUploading(false);
     }
@@ -82,7 +140,7 @@ export default function ImportPage() {
           Yer İmlerini İçe Aktar
         </h1>
         <p className="text-sm text-zinc-400 mt-1">
-          X (Twitter) yer imlerinizi dosya yükleyerek veya tarayıcıdan tek tıkla uygulamaya çekin.
+          X (Twitter) yer imlerinizi dosya yükleyerek, panodan yapıştırarak veya tarayıcı bookmarklet ile uygulamaya aktarın.
         </p>
       </div>
 
@@ -94,7 +152,7 @@ export default function ImportPage() {
             activeTab === "file" ? "text-blue-400" : "text-zinc-400 hover:text-zinc-200"
           }`}
         >
-          📁 Dosya Yükleme (JSON / X Arşivi)
+          📁 Dosya Yükleme / Pano
           {activeTab === "file" && (
             <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 rounded-full" />
           )}
@@ -125,7 +183,7 @@ export default function ImportPage() {
         </button>
       </div>
 
-      {/* Tab 1: File Dropzone */}
+      {/* Tab 1: File Dropzone & Clipboard Paste */}
       {activeTab === "file" && (
         <div className="space-y-6">
           <div
@@ -162,18 +220,30 @@ export default function ImportPage() {
             </div>
 
             <h3 className="text-base font-semibold text-zinc-200 mb-1">
-              Dosyanızı buraya sürükleyin veya seçin
+              Dosyanızı buraya sürükleyin veya panodan yapıştırın
             </h3>
             <p className="text-xs text-zinc-500 max-w-sm mx-auto mb-6">
-              Siftly <code>bookmarks.json</code>, Twitter Archive (<code>bookmarks.js</code> / <code>like.js</code>) veya standart JSON listeleri desteklenir.
+              Bookmarklet çıktısı, Siftly <code>bookmarks.json</code> veya Twitter Arşiv (<code>bookmarks.js</code> / <code>like.js</code>) formatları desteklenir.
             </p>
 
-            <label
-              htmlFor="file-input"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 rounded-xl text-xs font-medium cursor-pointer transition-colors shadow"
-            >
-              {uploading ? "İçe Aktarılıyor..." : "Dosya Seç (.json, .js)"}
-            </label>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <label
+                htmlFor="file-input"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 rounded-xl text-xs font-medium cursor-pointer transition-colors shadow"
+              >
+                {uploading ? "İçe Aktarılıyor..." : "Dosya Seç (.json, .js)"}
+              </label>
+
+              <button
+                type="button"
+                onClick={handlePasteFromClipboard}
+                disabled={uploading}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 rounded-xl text-xs font-medium cursor-pointer transition-colors shadow"
+              >
+                <ClipboardPaste size={14} />
+                {uploading ? "İçe Aktarılıyor..." : "📋 Panodan Yapıştır & Aktar"}
+              </button>
+            </div>
           </div>
 
           {/* Success card */}
@@ -204,9 +274,9 @@ export default function ImportPage() {
       {activeTab === "bookmarklet" && (
         <div className="p-6 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-6">
           <div>
-            <h3 className="text-base font-semibold text-zinc-100 mb-1">Tek Tıkla Yer İmlerini Çekin</h3>
+            <h3 className="text-base font-semibold text-zinc-100 mb-1">Tek Tıkla Yeni Yer İmlerini Çekin</h3>
             <p className="text-xs text-zinc-400">
-              Bu mini aracı tarayıcınızın yer imleri çubuğuna ekleyin. Ardından X yer imleri sayfasında tek tıkla çalıştırın.
+              Bu mini aracı tarayıcınızın yer imleri çubuğuna ekleyin. X yer imleri sayfasında çalıştırdığınızda eski tweete gelene kadar kaydırıp otomatik durur.
             </p>
           </div>
 
@@ -286,19 +356,17 @@ export default function ImportPage() {
                 <span className="text-zinc-500">(veya eski arayüzde x.com/i/bookmarks)</span>
               </li>
               <li>Sayfa açıkken yer imleri çubuğundaki <strong>🔖 X Bookmarks Aktar</strong> butonuna tıklayın.</li>
-              <li>Sayfanın sağ altında açılan panelden <strong>"▶ Otomatik Kaydır"</strong> butonuna basın (veya sayfayı kendiniz fareyle aşağı kaydırın; sayaç her yeni tweette otomatik artacaktır).</li>
-              <li>İstediğiniz miktarda yer imi toplandığında iki yoldan birini seçin:
+              <li>Açılan panelde <strong>"🎯 Eski tweette dur"</strong> seçeneği aktiftir. <strong>"▶ Otomatik Kaydır"</strong> butonuna basın.</li>
+              <li>Sayfadaki yeni tweetler taranıp daha önce aktarılmış eski tweete gelindiği anda tarama otomatik durdurulur.</li>
+              <li>Toplanan yeni tweetleri uygulamaya aktarmak için iki yöntemden birini seçin:
                 <ul className="list-disc list-inside ml-4 mt-1 space-y-1 text-zinc-300">
-                  <li><strong>📥 JSON İndir (Önerilen):</strong> Tek tıkla <code>x_bookmarks.json</code> dosyasını bilgisayarınıza indirin. Ardından bu sayfadaki <strong>"📁 Dosya Yükleme"</strong> sekmesinden dosyayı sürükleyip yükleyin.</li>
-                  <li><strong>🚀 Aktar:</strong> Yerel sunucu (localhost:3000) açıkken doğrudan veritabanına aktarın.</li>
+                  <li><strong>📋 Panoya Kopyala (En Pratiği):</strong> Butona basın, ardından MindMark X sayfasında <strong>"📋 Panodan Yapıştır & Aktar"</strong> butonuna tıklayın.</li>
+                  <li><strong>📥 JSON İndir:</strong> Tek tıkla <code>.json</code> dosyasını indirip bu sayfadaki sürükle-bırak alanına bırakın.</li>
                 </ul>
               </li>
             </ol>
             <div className="pt-2 text-[11px] text-blue-400/90 bg-blue-500/10 border border-blue-500/20 p-2.5 rounded-lg flex items-center gap-2">
-              <span>🎯</span> <span><strong>Akıllı Artımlı Tarama:</strong> Bookmarklet, veritabanınızdaki mevcut yer imlerini otomatik tanır. "Otomatik Kaydır" başladığında daha önce aktarılmış bir tweete rastladığı anda kaydırmayı otomatik durdurur; böylece yalnızca yeni eklenen tweetleri saniyeler içinde toplar.</span>
-            </div>
-            <div className="pt-1 text-[11px] text-emerald-400/90 bg-emerald-500/10 border border-emerald-500/20 p-2.5 rounded-lg flex items-center gap-2">
-              <span>💡</span> <span><strong>İpucu:</strong> Sayfayı kendiniz kaydırsanız bile sayaç canlı olarak toplanan tweetleri anında sayar. Toplama bitince yeşil <strong>"📥 JSON İndir"</strong> butonuna basmanız yeterlidir.</span>
+              <span>🎯</span> <span><strong>Akıllı Artımlı Durdurma:</strong> Durdurma hafızasındaki sayı, yeni bulunan tweetleri değil; durma referansı olarak tutulan eski tweetleri ifade eder. Zaten kayıtlı bir tweete rastlandığı anda tarama durur; böylece tüm geçmişi taramak yerine sadece yeni eklenenler saniyeler içinde alınır.</span>
             </div>
           </div>
         </div>
@@ -311,7 +379,7 @@ export default function ImportPage() {
             <div>
               <h3 className="text-base font-semibold text-zinc-100 mb-1">Geliştirici Konsolu Betiği</h3>
               <p className="text-xs text-zinc-400">
-                x.com/i/history (veya x.com/i/bookmarks) sayfasında F12 konsoluna yapıştırarak aynı işlemi çalıştırabilirsiniz.
+                x.com/i/history sayfasında F12 geliştirici konsoluna yapıştırarak aynı işlemi çalıştırabilirsiniz.
               </p>
             </div>
             <button

@@ -1,4 +1,7 @@
-export const BOOKMARKLET_RAW_SCRIPT = `(() => {
+// Helper to build bookmarklet script with optional embedded recent tweet IDs
+export function buildBookmarkletScript(initialIds: string[] = []): string {
+  const idsJson = JSON.stringify(initialIds.slice(0, 50));
+  return `(() => {
   if (window.__X_BM_LOADED) {
     alert("X Bookmark yakalayıcı zaten aktif!");
     return;
@@ -6,12 +9,12 @@ export const BOOKMARKLET_RAW_SCRIPT = `(() => {
   window.__X_BM_LOADED = true;
 
   const captured = new Map();
-  const knownIds = new Set();
+  const knownIds = new Set(${idsJson});
   let scrolling = false;
   let scrollInterval = null;
   let smartStopTriggered = false;
 
-  // Load known IDs from localStorage cache if available
+  // Load known IDs from localStorage cache on x.com
   try {
     const cached = localStorage.getItem("__x_bm_known_ids");
     if (cached) {
@@ -35,83 +38,79 @@ export const BOOKMARKLET_RAW_SCRIPT = `(() => {
   panel.style.fontFamily = "system-ui, -apple-system, sans-serif";
   panel.style.fontSize = "13px";
   panel.style.border = "1px solid #3f3f46";
-  panel.style.width = "310px";
+  panel.style.width = "320px";
 
   panel.innerHTML = \`
-    <div style="font-weight: 700; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-      <span style="display: flex; align-items: center; gap: 6px;">🔖 X Bookmarks</span>
-      <span id="x-bm-count" style="background: #2563eb; color: white; padding: 2px 10px; border-radius: 9999px; font-size: 13px; font-weight: 700;">0</span>
+    <div style="font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+      <span style="display: flex; align-items: center; gap: 6px;">🔖 MindMark X</span>
+      <span id="x-bm-count" style="background: #3f3f46; color: white; padding: 3px 10px; border-radius: 9999px; font-size: 12px; font-weight: 700;">0 Yeni</span>
     </div>
 
     <!-- Smart Incremental Stop Toggle -->
-    <div style="margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; background: #27272a; padding: 6px 10px; border-radius: 8px; font-size: 11px;">
-      <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
-        <input type="checkbox" id="x-bm-smart-stop" checked style="cursor: pointer; accent-color: #3b82f6;" />
-        <span style="font-weight: 600; color: #e4e4e7;">🎯 Kayıtlı tweette dur</span>
-      </label>
-      <span id="x-bm-known-badge" style="color: #60a5fa; font-size: 10px;">Bağlanıyor...</span>
+    <div style="margin-bottom: 10px; background: #27272a; padding: 8px 10px; border-radius: 8px; font-size: 11px;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
+          <input type="checkbox" id="x-bm-smart-stop" checked style="cursor: pointer; accent-color: #3b82f6;" />
+          <span style="font-weight: 600; color: #e4e4e7;">🎯 Eski tweette dur</span>
+        </label>
+      </div>
+      <div id="x-bm-ref-info" style="color: #71717a; font-size: 10px; margin-top: 4px; margin-left: 18px;">
+        \${knownIds.size > 0 ? ("Durdurma hafızası: " + knownIds.size + " eski tweet kayıtlı") : "Durdurma hafızası boş (tümü taranır)"}
+      </div>
     </div>
 
-    <div style="font-size: 11px; color: #a1a1aa; margin-bottom: 12px; line-height: 1.4;" id="x-bm-status">
-      Hazır. Sayfayı kaydırın veya Başlat'a basın.
+    <div style="font-size: 11px; color: #d4d4d8; margin-bottom: 12px; line-height: 1.4; background: #202024; padding: 10px; border-radius: 8px; border: 1px solid #333;" id="x-bm-status">
+      Hazır. Tweetler kontrol ediliyor...
     </div>
+
     <div style="display: flex; flex-direction: column; gap: 8px;">
-      <button id="x-bm-scroll-btn" style="padding: 8px 12px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">
+      <button id="x-bm-scroll-btn" style="padding: 9px 12px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">
         ▶ Otomatik Kaydır
       </button>
       <div style="display: flex; gap: 8px;">
         <button id="x-bm-dl-btn" style="flex: 1; padding: 8px 10px; background: #059669; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">
           📥 JSON İndir
         </button>
-        <button id="x-bm-send-btn" style="flex: 1; padding: 8px 10px; background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">
-          🚀 Aktar
+        <button id="x-bm-copy-btn" style="flex: 1; padding: 8px 10px; background: #3f3f46; color: #f4f4f5; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">
+          📋 Panoya Kopyala
         </button>
       </div>
     </div>
-    <button id="x-bm-close-btn" style="width: 100%; margin-top: 8px; padding: 4px; background: transparent; color: #71717a; border: none; cursor: pointer; font-size: 11px;">
-      Kapat
-    </button>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 6px; border-top: 1px solid #27272a;">
+      <button id="x-bm-clear-cache-btn" style="background: transparent; color: #71717a; border: none; cursor: pointer; font-size: 10px; text-decoration: underline;">
+        Hafızayı Sıfırla
+      </button>
+      <button id="x-bm-close-btn" style="background: transparent; color: #71717a; border: none; cursor: pointer; font-size: 11px;">
+        Kapat ✕
+      </button>
+    </div>
   \`;
   document.body.appendChild(panel);
 
   const countEl = panel.querySelector("#x-bm-count");
   const statusEl = panel.querySelector("#x-bm-status");
-  const knownBadge = panel.querySelector("#x-bm-known-badge");
+  const refInfo = panel.querySelector("#x-bm-ref-info");
   const smartStopCheckbox = panel.querySelector("#x-bm-smart-stop");
   const scrollBtn = panel.querySelector("#x-bm-scroll-btn");
   const dlBtn = panel.querySelector("#x-bm-dl-btn");
-  const sendBtn = panel.querySelector("#x-bm-send-btn");
+  const copyBtn = panel.querySelector("#x-bm-copy-btn");
+  const clearCacheBtn = panel.querySelector("#x-bm-clear-cache-btn");
   const closeBtn = panel.querySelector("#x-bm-close-btn");
 
-  // Fetch known IDs from local MindMark-X API
-  const fetchKnownIds = async () => {
-    try {
-      const res = await fetch("http://localhost:3000/api/import", { method: "GET" });
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data.recentIds)) {
-          data.recentIds.forEach(id => knownIds.add(String(id)));
-          try {
-            localStorage.setItem("__x_bm_known_ids", JSON.stringify(Array.from(knownIds).slice(0, 500)));
-          } catch (e) {}
-        }
-        knownBadge.innerText = knownIds.size + " kayıtlı";
-        knownBadge.style.color = "#10b981";
-        statusEl.innerText = "Bağlandı (" + knownIds.size + " kayıtlı yer imi biliniyor). Yalnızca yeni tweetler toplanacak.";
-        return;
-      }
-    } catch (err) {}
-
-    if (knownIds.size > 0) {
-      knownBadge.innerText = knownIds.size + " (önbellek)";
-      knownBadge.style.color = "#f59e0b";
-      statusEl.innerText = "Önbellekte " + knownIds.size + " kayıtlı yer imi var. Yeni olanlar taranacak.";
-    } else {
-      knownBadge.innerText = "Çevrimdışı";
-      knownBadge.style.color = "#a1a1aa";
-    }
+  const updateCountBadge = () => {
+    countEl.innerText = captured.size + " Yeni";
+    countEl.style.background = captured.size > 0 ? "#10b981" : "#3f3f46";
   };
-  fetchKnownIds();
+
+  const syncCache = () => {
+    const data = Array.from(captured.values());
+    data.forEach(item => knownIds.add(item.tweet_id));
+    try {
+      localStorage.setItem("__x_bm_known_ids", JSON.stringify(Array.from(knownIds).slice(0, 1000)));
+      if (refInfo) refInfo.innerText = "Durdurma hafızası: " + knownIds.size + " eski tweet kayıtlı";
+    } catch (e) {}
+  };
 
   const cleanup = () => {
     if (scrollInterval) clearInterval(scrollInterval);
@@ -120,6 +119,15 @@ export const BOOKMARKLET_RAW_SCRIPT = `(() => {
     window.__X_BM_LOADED = false;
   };
   closeBtn.onclick = cleanup;
+
+  clearCacheBtn.onclick = () => {
+    if (confirm("Durdurma hafızası temizlensin mi? (Bir sonraki taramada tüm tweetler taranır)")) {
+      knownIds.clear();
+      try { localStorage.removeItem("__x_bm_known_ids"); } catch (e) {}
+      if (refInfo) refInfo.innerText = "Durdurma hafızası boş (tümü taranır)";
+      statusEl.innerHTML = "🔄 Hafıza temizlendi. Artık tüm tweetler taranabilir.";
+    }
+  };
 
   function stopScrolling(reasonMsg) {
     if (scrolling) {
@@ -176,10 +184,12 @@ export const BOOKMARKLET_RAW_SCRIPT = `(() => {
         if (smartStopCheckbox.checked && knownIds.has(tweetId)) {
           if (!smartStopTriggered) {
             smartStopTriggered = true;
-            stopScrolling(
-              "<span style='color: #10b981; font-weight: 700;'>🎯 Mevcut yer imine ulaşıldı!</span><br/>" +
-              "Daha önce aktarılmış tweete gelindi. Sadece <b>" + captured.size + " yeni tweet</b> toplandı."
-            );
+            stopScrolling();
+            if (captured.size > 0) {
+              statusEl.innerHTML = "<span style='color: #10b981; font-weight: 700;'>🎯 " + captured.size + " YENİ tweet yakalandı!</span><br/>Daha önce aktarılmış eski tweete ulaşıldı ve duruldu. İndirebilir veya panoya kopyalayabilirsiniz.";
+            } else {
+              statusEl.innerHTML = "<span style='color: #60a5fa; font-weight: 700;'>ℹ️ Yeni tweet yok.</span><br/>Görünen ilk tweet zaten daha önce aktarılmış. Tümü için 'Eski tweette dur' işaretini kaldırın.";
+            }
           }
           return;
         }
@@ -221,9 +231,9 @@ export const BOOKMARKLET_RAW_SCRIPT = `(() => {
           media
         });
 
-        countEl.innerText = String(captured.size);
-        if (!smartStopTriggered) {
-          statusEl.innerText = captured.size + " yeni yer imi toplandı. İndirebilir veya aktarabilirsiniz.";
+        updateCountBadge();
+        if (!smartStopTriggered && !scrolling) {
+          statusEl.innerHTML = "👀 <b>" + captured.size + " yeni tweet</b> görüldü. Sayfayı kaydırın veya '▶ Otomatik Kaydır' butonuna basın.";
         }
       } catch (e) {}
     }
@@ -234,13 +244,13 @@ export const BOOKMARKLET_RAW_SCRIPT = `(() => {
 
   scrollBtn.onclick = () => {
     if (scrolling) {
-      stopScrolling("Duraklatıldı. (" + captured.size + " yeni toplandı)");
+      stopScrolling("Duraklatıldı. (" + captured.size + " yeni tweet)");
     } else {
       smartStopTriggered = false;
       scrolling = true;
       scrollBtn.innerText = "⏸ Durdur";
       scrollBtn.style.background = "#ef4444";
-      statusEl.innerText = "Yeni yer imleri taranıyor...";
+      statusEl.innerText = "Yeni tweetler taranıyor... (" + captured.size + " bulundu)";
       let stalls = 0;
       let lastCount = 0;
 
@@ -260,6 +270,9 @@ export const BOOKMARKLET_RAW_SCRIPT = `(() => {
         } else {
           stalls = 0;
           lastCount = captured.size;
+          if (scrolling) {
+            statusEl.innerText = "Taranıyor: " + captured.size + " yeni tweet bulundu...";
+          }
         }
       }, 700);
     }
@@ -269,70 +282,53 @@ export const BOOKMARKLET_RAW_SCRIPT = `(() => {
   dlBtn.onclick = () => {
     captureVisible();
     if (captured.size === 0) {
-      alert("Henüz yeni yer imi toplanmadı! Lütfen sayfayı aşağı kaydırıp tweetlerin yüklendiğinden emin olun veya ▶ Otomatik Kaydır butonuna basın.");
+      alert("Henüz yeni yer imi toplanmadı! Lütfen sayfayı aşağı kaydırın veya ▶ Otomatik Kaydır butonuna basın.");
       return;
     }
 
     const data = Array.from(captured.values());
-    data.forEach(item => knownIds.add(item.tweet_id));
-    try {
-      localStorage.setItem("__x_bm_known_ids", JSON.stringify(Array.from(knownIds).slice(0, 500)));
-    } catch (e) {}
+    syncCache();
 
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "x_bookmarks_yeni_" + new Date().toISOString().slice(0, 10) + ".json";
+    a.download = "x_bookmarks_yeni_" + data.length + "adet_" + new Date().toISOString().slice(0, 10) + ".json";
     document.body.appendChild(a);
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    statusEl.innerHTML = "✅ <b>" + data.length + " yeni yer imi</b> JSON olarak indirildi!";
+    statusEl.innerHTML = "✅ <b>" + data.length + " yeni yer imi</b> indirildi!<br/>MindMark X /import sayfasına yükleyebilirsiniz.";
   };
 
-  // Send to local server
-  sendBtn.onclick = async () => {
+  // Copy JSON directly to clipboard
+  copyBtn.onclick = async () => {
     captureVisible();
     if (captured.size === 0) {
-      alert("Henüz yeni yer imi toplanmadı! Lütfen sayfayı aşağı kaydırıp tweetlerin yüklendiğinden emin olun veya ▶ Otomatik Kaydır butonuna basın.");
+      alert("Henüz yeni yer imi toplanmadı!");
       return;
     }
 
-    statusEl.innerText = "Yerel uygulamaya aktarılıyor...";
-    sendBtn.disabled = true;
+    const data = Array.from(captured.values());
+    syncCache();
 
     try {
-      const payload = Array.from(captured.values());
-      const res = await fetch("http://localhost:3000/api/import", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (res.ok) {
-        payload.forEach(item => knownIds.add(item.tweet_id));
-        try {
-          localStorage.setItem("__x_bm_known_ids", JSON.stringify(Array.from(knownIds).slice(0, 500)));
-        } catch (e) {}
-        knownBadge.innerText = knownIds.size + " kayıtlı";
-        knownBadge.style.color = "#10b981";
-
-        statusEl.innerHTML = "<span style='color: #10b981; font-weight: 700;'>Başarılı!</span> " + data.imported + " yeni eklendi (" + data.skipped + " mükerrer).";
-        alert("Başarılı! " + data.imported + " yeni yer imi yerel veritabanına aktarıldı.");
-      } else {
-        statusEl.innerText = "Hata: " + (data.error || "Sunucuya bağlanılamadı");
-      }
+      await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+      statusEl.innerHTML = "📋 <b>" + data.length + " yeni yer imi</b> panoya kopyalandı!<br/>MindMark X sayfasında 'Panodan Yapıştır' butonuna basabilirsiniz.";
     } catch (err) {
-      statusEl.innerText = "Hata: Yerel sunucu açık mı? (localhost:3000)";
-      alert("Hata: http://localhost:3000 sunucusuna erişilemedi. İsterseniz '📥 JSON İndir' butonuyla dosyayı indirip manuel yükleyebilirsiniz.");
-    } finally {
-      sendBtn.disabled = false;
+      alert("Panoya kopyalanamadı, '📥 JSON İndir' butonunu kullanabilirsiniz.");
     }
   };
 
+  // Run initial scan on visible viewport
   captureVisible();
+  if (!smartStopTriggered && captured.size === 0) {
+    statusEl.innerText = "Hazır. Sayfayı kaydırın veya '▶ Otomatik Kaydır' butonuna basın.";
+  }
 })();`;
+}
+
+export const BOOKMARKLET_RAW_SCRIPT = buildBookmarkletScript();
 
 // Build minified bookmarklet representation dynamically from RAW script
 function minifyJs(src: string): string {
@@ -345,6 +341,9 @@ function minifyJs(src: string): string {
 
 export const BOOKMARKLET_MINIFIED = minifyJs(BOOKMARKLET_RAW_SCRIPT);
 
-export function getBookmarkletHref(): string {
+export function getBookmarkletHref(initialIds: string[] = []): string {
+  if (initialIds.length > 0) {
+    return `javascript:${minifyJs(buildBookmarkletScript(initialIds))}`;
+  }
   return `javascript:${BOOKMARKLET_MINIFIED}`;
 }
