@@ -9,7 +9,8 @@
     "lint": "next lint",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx lib/db/seed.ts",
-    "export:hermes": "tsx scripts/export-hermes-dataset.ts"
+    "export:hermes": "tsx scripts/export-hermes-dataset.ts",
+    "export:obsidian": "tsx scripts/export-obsidian.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.125.0",

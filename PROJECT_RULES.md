@@ -159,6 +159,7 @@ Commands MUST come from repository configuration. Never invent them.
 | DB Schema Push | `npm run db:push` (`drizzle-kit push`) | `package.json`, `drizzle.config.ts` | `UNVERIFIED` |
 | DB Seed | `npm run db:seed` (`tsx lib/db/seed.ts`) | `package.json`, `lib/db/seed.ts` | `UNVERIFIED` |
 | Hermes Dataset Export | `npm run export:hermes` (`tsx scripts/export-hermes-dataset.ts`) | `package.json`, `scripts/export-hermes-dataset.ts` | `VERIFIED` |
+| Obsidian Export | `npm run export:obsidian` (`tsx scripts/export-obsidian.ts`) | `package.json`, `scripts/export-obsidian.ts` | `VERIFIED` |
 
 `VERIFIED` = source found and command executed; `UNVERIFIED` = source found but execution unconfirmed; `UNKNOWN` = no reliable source; `N/A` = not applicable.
 
@@ -267,6 +268,7 @@ May add project requirements; may not weaken universal branch/merge rules.
 | Drizzle Config | `drizzle.config.ts` | Drizzle Kit SQLite configuration |
 | Verification Test | `test/verify.ts` | Automated end-to-end unit & integration verification |
 | Hermes Dataset Script | `scripts/export-hermes-dataset.ts` | Twitter archive tweets.js to ChatML & Markdown dataset converter |
+| Obsidian Exporter | `scripts/export-obsidian.ts` | Syncs analyzed bookmarks to Obsidian Vault with YAML frontmatter & categories |
 | Development Log | `DEVELOPMENT_LOG.md` | Activity data only; format governed by `UNIVERSAL_RULES.md` |
 
 Only verified paths belong here.

@@ -1,3 +1,28 @@
+## 2026-09-13 21:07 — Obsidian Vault Senkronizasyon Betiği Eklendi
+
+- **Type:** `Feature`
+- **Status:** `Completed`
+- **Branch:** `main`
+- **Commit:** `fe4bd3e`
+- **Developer:** `AI Agent`
+- **Scope:** `Obsidian Entegrasyonu & CLI`
+
+### Summary
+Analiz edilmiş yer imlerini YAML frontmatter, Türkçe AI özeti callout'u, orijinal tweet metni, OCR notları ve çift köşeli kategori bağlantıları (`[[Kategori]]`) ile Obsidian Vault içine kategori klasörleri halinde atomik Markdown notları olarak senkronize eden betik eklendi.
+
+### Changes
+- `scripts/export-obsidian.ts` oluşturuldu; Windows dosya adı sanitizasyonu, artımlı (incremental) senkronizasyon, kategori alt klasörleme ve ana `📌 X Yer İmleri Fihristi.md` dizini üretimi kodlandı.
+- `package.json` dosyasına `export:obsidian` komutu eklendi.
+- `PROJECT_RULES.md` yeni betik ve komut ile senkronize edildi.
+
+### Validation
+- `npx tsc --noEmit` — `PASS`
+- `npx tsx test/verify.ts` — `PASS`
+- `npm run export:obsidian` — `PASS` (188 yer imi Obsidian Vault'a aktarıldı)
+
+### Notes
+Kullanıcının `C:\Users\smetc\Documents\Obsidian Vault\30-Kaynaklar\X Yer İmlerim` konumuna 9 kategori klasörü ve 188 atomik `.md` notu başarıyla üretildi.
+
 ## 2026-09-13 00:54 — Hermes Yapay Zeka Eğitimi İçin Tweet Arşivi Dönüştürücü Betiği Eklendi
 
 - **Type:** `Feature`
