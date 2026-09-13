@@ -64,6 +64,7 @@ MindMark X
 ├── app/                     # Next.js App Router (UI pages & API handlers)
 │   ├── api/                 # Next.js Server Route Handlers
 │   │   ├── bookmarks/       # GET (list/filter), DELETE (item or purge)
+│   │   ├── export/obsidian/ # POST (sync bookmarks to Obsidian Vault), GET (path)
 │   │   ├── import/          # POST (parse & insert), OPTIONS (CORS for bookmarklet)
 │   │   ├── pipeline/        # GET (status), POST (start), DELETE (stop)
 │   │   └── settings/        # GET (config/stats), POST (save), PUT (categories)
@@ -92,9 +93,14 @@ MindMark X
 │   │   ├── index.ts         # LibSQL SQLite client and Drizzle instance
 │   │   ├── schema.ts        # SQLite tables: categories, bookmarks, settings
 │   │   └── seed.ts          # Default category set and initial provider settings
+│   ├── export/              # Knowledge export services
+│   │   └── obsidian.ts      # Obsidian Vault sync service and Markdown builder
 │   └── import/              # X bookmark ingestion and parsing
 │       ├── bookmarklet.ts   # In-browser DOM bookmarklet script
 │       └── parser.ts        # Archive & API schema normalizer with deduplication
+├── scripts/                 # CLI utilities
+│   ├── export-hermes-dataset.ts # Hermes AI training dataset extractor
+│   └── export-obsidian.ts       # CLI Obsidian vault sync runner
 └── test/                    # Verification and test scripts
     └── verify.ts            # Automated end-to-end integration test
 ```
@@ -252,6 +258,8 @@ May add project requirements; may not weaken universal branch/merge rules.
 | Import API | `app/api/import/route.ts` | POST (batch ingest with deduplication on tweetId), OPTIONS (CORS) |
 | Pipeline API | `app/api/pipeline/route.ts` | GET (status), POST (start), DELETE (stop) |
 | Settings API | `app/api/settings/route.ts` | GET (config & stats), POST (save keys), PUT (category CRUD) |
+| Obsidian Export API | `app/api/export/obsidian/route.ts` | POST (trigger sync, save vault path), GET (get path) |
+| Obsidian Sync Service | `lib/export/obsidian.ts` | Obsidian Vault incremental Markdown sync engine |
 | AI Pipeline Engine | `lib/ai/pipeline.ts` | Concurrency-controlled multi-worker processor |
 | AI Sanitizer | `lib/ai/sanitizer.ts` | DeepSeek `<think>` block stripper and dual-key slug matcher |
 | AI Prompts | `lib/ai/prompts.ts` | Turkish summary enforcement and system/user prompts |

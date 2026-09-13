@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Settings as SettingsIcon, Save, Plus, Trash2, CheckCircle2, Eye, Key } from "lucide-react";
+import { Settings as SettingsIcon, Save, Plus, Trash2, CheckCircle2, Eye, Key, FolderSync } from "lucide-react";
 
 interface Category {
   id: string;
@@ -24,10 +24,19 @@ export default function SettingsPage() {
     openrouter_api_key: "",
     openrouter_model: "deepseek/deepseek-chat",
     enable_vision: "true",
+    obsidian_vault_path: "C:\\Users\\smetc\\Documents\\Obsidian Vault\\30-Kaynaklar\\X Yer İmlerim",
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [syncingObsidian, setSyncingObsidian] = useState(false);
+  const [obsidianResult, setObsidianResult] = useState<{
+    created: number;
+    skipped: number;
+    total: number;
+    time: string;
+  } | null>(null);
+  const [obsidianError, setObsidianError] = useState<string | null>(null);
 
   // New category form state
   const [newCat, setNewCat] = useState({ id: "", name: "", color: "#3b82f6", description: "" });
@@ -59,6 +68,33 @@ export default function SettingsPage() {
       alert("Ayarlar kaydedilemedi.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSyncObsidian = async () => {
+    setSyncingObsidian(true);
+    setObsidianResult(null);
+    setObsidianError(null);
+    try {
+      const res = await fetch("/api/export/obsidian", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ vaultPath: settings.obsidian_vault_path }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Obsidian senkronizasyonu başarısız oldu.");
+      }
+      setObsidianResult({
+        created: data.created,
+        skipped: data.skipped,
+        total: data.total,
+        time: new Date().toLocaleTimeString("tr-TR"),
+      });
+    } catch (err: any) {
+      setObsidianError(err.message || "Bilinmeyen bir hata oluştu.");
+    } finally {
+      setSyncingObsidian(false);
     }
   };
 
@@ -400,6 +436,65 @@ export default function SettingsPage() {
             </div>
           </div>
         </form>
+      </div>
+
+      {/* Obsidian Vault Integration */}
+      <div className="p-6 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
+              <FolderSync size={18} className="text-purple-400" /> Obsidian Vault Senkronizasyonu
+            </h2>
+            <p className="text-xs text-zinc-400 mt-1">
+              Yapay zeka ile analiz edilmiş tweetleri, Türkçe özetleri ve etiketleri yerel Obsidian kütüphanenize atomik Markdown notları olarak aktarın.
+            </p>
+          </div>
+          <span className="px-2.5 py-1 text-[11px] font-medium rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 shrink-0">
+            Local-First
+          </span>
+        </div>
+
+        <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80 space-y-3">
+          <label className="block text-xs font-semibold text-zinc-300">
+            Obsidian Vault / Hedef Klasör Yolu
+          </label>
+          <input
+            type="text"
+            value={settings.obsidian_vault_path || ""}
+            onChange={(e) => setSettings({ ...settings, obsidian_vault_path: e.target.value })}
+            placeholder="C:\Users\...\Obsidian Vault\30-Kaynaklar\X Yer İmlerim"
+            className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-zinc-200 focus:outline-none focus:border-purple-500/60"
+          />
+          <p className="text-[11px] text-zinc-500">
+            Her tweet ilgili kategorisinin alt klasörüne (örneğin <span className="text-zinc-400 font-mono">📁 Yapay Zeka & ML</span>) YAML frontmatter, Türkçe AI özeti callout'u ve çift köşeli kategori bağlantılarıyla (<span className="text-zinc-400 font-mono">[[Kategori]]</span>) kaydedilir.
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-1">
+          <div className="text-xs">
+            {obsidianResult && (
+              <span className="flex items-center gap-1.5 text-emerald-400 font-medium animate-in fade-in">
+                <CheckCircle2 size={15} />
+                {obsidianResult.total} yer imi güncellendi ({obsidianResult.created} yeni, {obsidianResult.skipped} değişmemiş) — {obsidianResult.time}
+              </span>
+            )}
+            {obsidianError && (
+              <span className="text-red-400 font-medium">
+                Hata: {obsidianError}
+              </span>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSyncObsidian}
+            disabled={syncingObsidian}
+            className="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-500/20 transition-all cursor-pointer disabled:opacity-50"
+          >
+            <FolderSync size={15} className={syncingObsidian ? "animate-spin" : ""} />
+            {syncingObsidian ? "Senkronize Ediliyor..." : "Obsidian'a Şimdi Senkronize Et"}
+          </button>
+        </div>
       </div>
 
       {/* Database Management & Reset */}

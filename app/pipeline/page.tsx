@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Cpu, Play, Square, RefreshCw, CheckCircle2, AlertTriangle, Sparkles, Clock } from "lucide-react";
+import { Cpu, Play, Square, RefreshCw, CheckCircle2, AlertTriangle, Sparkles, Clock, FolderSync } from "lucide-react";
 import Link from "next/link";
 
 interface PipelineStatus {
@@ -24,6 +24,8 @@ export default function PipelinePage() {
   });
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [actionLoading, setActionLoading] = useState(false);
+  const [syncingObsidian, setSyncingObsidian] = useState(false);
+  const [obsidianSuccess, setObsidianSuccess] = useState<string | null>(null);
 
   // Poll status
   useEffect(() => {
@@ -76,6 +78,25 @@ export default function PipelinePage() {
     try {
       await fetch("/api/pipeline", { method: "DELETE" });
     } catch (err) { /* ignore */ }
+  };
+
+  const handleSyncObsidian = async () => {
+    setSyncingObsidian(true);
+    setObsidianSuccess(null);
+    try {
+      const res = await fetch("/api/export/obsidian", { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        setObsidianSuccess(`${data.total} yer imi Obsidian'a senkronize edildi (${data.created} yeni)`);
+        setTimeout(() => setObsidianSuccess(null), 5000);
+      } else {
+        alert("Hata: " + (data.error || "Aktarım başarısız."));
+      }
+    } catch (err: any) {
+      alert("Bağlantı hatası: " + err.message);
+    } finally {
+      setSyncingObsidian(false);
+    }
   };
 
   const progressPercent = status.total > 0 ? Math.round((status.processed / status.total) * 100) : 0;
@@ -166,6 +187,15 @@ export default function PipelinePage() {
                 >
                   <RefreshCw size={13} /> Tümünü Yeniden Tara
                 </button>
+                <button
+                  onClick={handleSyncObsidian}
+                  disabled={syncingObsidian}
+                  className="flex items-center gap-2 px-3.5 py-2 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 rounded-xl text-xs font-medium transition-colors border border-purple-500/30 cursor-pointer disabled:opacity-50"
+                  title="Analiz edilmiş yer imlerini Obsidian Vault'a senkronize eder"
+                >
+                  <FolderSync size={13} className={syncingObsidian ? "animate-spin" : ""} />
+                  {syncingObsidian ? "Aktarılıyor..." : "Obsidian'a Aktar"}
+                </button>
               </>
             ) : (
               <button
@@ -177,6 +207,14 @@ export default function PipelinePage() {
             )}
           </div>
         </div>
+
+        {/* Obsidian Sync Banner */}
+        {obsidianSuccess && (
+          <div className="p-3.5 rounded-xl bg-purple-950/30 border border-purple-800/40 text-xs text-purple-200 flex items-center gap-2 animate-in fade-in">
+            <CheckCircle2 size={16} className="text-purple-400 shrink-0" />
+            <span>{obsidianSuccess}</span>
+          </div>
+        )}
 
         {/* Progress Bar */}
         <div className="space-y-2">

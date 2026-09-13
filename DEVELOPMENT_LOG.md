@@ -1,3 +1,30 @@
+## 2026-09-13 23:26 — Ayarlar ve Pipeline Arayüzlerine Obsidian Senkronizasyon Desteği Eklendi
+
+- **Type:** `Feature`
+- **Status:** `Completed`
+- **Branch:** `main`
+- **Commit:** `4255331`
+- **Developer:** `AI Agent`
+- **Scope:** `Kullanıcı Arayüzü & API (Obsidian)`
+
+### Summary
+Kullanıcının tek tıkla Obsidian Vault'una yer imlerini senkronize edebilmesi için `/api/export/obsidian` API rotası, Ayarlar sayfasında Vault yolu yönetim kartı ve Pipeline (AI Analiz Merkezi) ekranına anında senkronizasyon butonu eklendi.
+
+### Changes
+- `lib/export/obsidian.ts` çekirdek senkronizasyon servisi haline getirildi ve `scripts/export-obsidian.ts` ile ortaklaştırıldı.
+- `app/api/export/obsidian/route.ts` API rotası oluşturuldu; POST ile Vault yolunu kaydedip senkronizasyonu tetikleme, GET ile mevcut yolu okuma desteği sağlandı.
+- `app/settings/page.tsx` sayfasına "Obsidian Vault Senkronizasyonu" kartı, Vault yolu input alanı ve tek tıkla senkronizasyon butonu eklendi.
+- `app/pipeline/page.tsx` sayfasına analiz sonrasında tek tıkla Vault'a aktarım sağlayan "Obsidian'a Aktar" butonu ve durum bildirimleri eklendi.
+- `PROJECT_RULES.md` yeni API ve servis modülleri ile güncellendi.
+
+### Validation
+- `npx tsc --noEmit` — `PASS`
+- `npx tsx test/verify.ts` — `PASS`
+- `npm run build` — `PASS` (13 rota derlendi)
+
+### Notes
+Kullanıcı web arayüzünden doğrudan Vault yolunu özelleştirebilir ve tek tıkla tüm yer imlerini güncelleyebilir.
+
 ## 2026-09-13 21:07 — Obsidian Vault Senkronizasyon Betiği Eklendi
 
 - **Type:** `Feature`
