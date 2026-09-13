@@ -4,9 +4,11 @@ import { bookmarks } from "@/lib/db/schema";
 import { parseTweetData } from "@/lib/import/parser";
 import { startPipeline } from "@/lib/ai/pipeline";
 
+import { desc } from "drizzle-orm";
+
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
@@ -15,6 +17,31 @@ export async function OPTIONS() {
     status: 204,
     headers: CORS_HEADERS,
   });
+}
+
+export async function GET() {
+  try {
+    const recent = await db
+      .select({ tweetId: bookmarks.tweetId })
+      .from(bookmarks)
+      .orderBy(desc(bookmarks.createdAt), desc(bookmarks.importedAt))
+      .limit(1000);
+
+    const ids = recent.map((r) => r.tweetId);
+    return NextResponse.json(
+      {
+        count: ids.length,
+        latestTweetId: ids[0] || null,
+        recentIds: ids,
+      },
+      { headers: CORS_HEADERS }
+    );
+  } catch (err: any) {
+    return NextResponse.json(
+      { error: err?.message || "Failed to fetch sync state" },
+      { status: 500, headers: CORS_HEADERS }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {

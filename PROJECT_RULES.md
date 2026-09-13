@@ -65,7 +65,7 @@ MindMark X
 │   ├── api/                 # Next.js Server Route Handlers
 │   │   ├── bookmarks/       # GET (list/filter), DELETE (item or purge)
 │   │   ├── export/obsidian/ # POST (sync bookmarks to Obsidian Vault), GET (path)
-│   │   ├── import/          # POST (parse & insert), OPTIONS (CORS for bookmarklet)
+│   │   ├── import/          # POST (parse & insert), GET (recent IDs for smart sync), OPTIONS (CORS)
 │   │   ├── pipeline/        # GET (status), POST (start), DELETE (stop)
 │   │   └── settings/        # GET (config/stats), POST (save), PUT (categories)
 │   ├── import/              # Bookmark ingestion UI (File, Bookmarklet, Console)
@@ -255,7 +255,7 @@ May add project requirements; may not weaken universal branch/merge rules.
 | Import Page | `app/import/page.tsx` | File upload dropzone, bookmarklet instructions, console script |
 | Settings Page | `app/settings/page.tsx` | AI credentials and category schema management |
 | Bookmarks API | `app/api/bookmarks/route.ts` | GET (filtering/search/pagination), DELETE (item or bulk) |
-| Import API | `app/api/import/route.ts` | POST (batch ingest with deduplication on tweetId), OPTIONS (CORS) |
+| Import API | `app/api/import/route.ts` | POST (batch ingest with deduplication on tweetId), GET (recent IDs for incremental sync), OPTIONS (CORS) |
 | Pipeline API | `app/api/pipeline/route.ts` | GET (status), POST (start), DELETE (stop) |
 | Settings API | `app/api/settings/route.ts` | GET (config & stats), POST (save keys), PUT (category CRUD) |
 | Obsidian Export API | `app/api/export/obsidian/route.ts` | POST (trigger sync, save vault path), GET (get path) |
@@ -315,7 +315,7 @@ Do not infer tool capabilities from a name alone.
 - Turkish Summary Enforcement: AI summary outputs MUST strictly be generated in Turkish, regardless of tweet origin language (lib/ai/prompts.ts).
 - Self-Hosted Localhost Execution: App runs locally on Windows (Node.js localhost:3000); requires no external cloud backend.
 - SQLite Compatibility: File-based SQLite operations via @libsql/client using path.resolve for Windows path safety (lib/db/index.ts).
-- Bookmarklet CORS: /api/import must maintain CORS headers (Access-Control-Allow-Origin: *) to allow direct POST from x.com.
+- Bookmarklet CORS: /api/import must maintain CORS headers (Access-Control-Allow-Origin: *) to allow direct POST and GET from x.com.
 - No Guessing / Repository Reality: Verify paths, types, and commands before making changes.
 ```
 

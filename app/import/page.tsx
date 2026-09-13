@@ -294,7 +294,10 @@ export default function ImportPage() {
                 </ul>
               </li>
             </ol>
-            <div className="pt-2 text-[11px] text-emerald-400/90 bg-emerald-500/10 border border-emerald-500/20 p-2.5 rounded-lg flex items-center gap-2">
+            <div className="pt-2 text-[11px] text-blue-400/90 bg-blue-500/10 border border-blue-500/20 p-2.5 rounded-lg flex items-center gap-2">
+              <span>🎯</span> <span><strong>Akıllı Artımlı Tarama:</strong> Bookmarklet, veritabanınızdaki mevcut yer imlerini otomatik tanır. "Otomatik Kaydır" başladığında daha önce aktarılmış bir tweete rastladığı anda kaydırmayı otomatik durdurur; böylece yalnızca yeni eklenen tweetleri saniyeler içinde toplar.</span>
+            </div>
+            <div className="pt-1 text-[11px] text-emerald-400/90 bg-emerald-500/10 border border-emerald-500/20 p-2.5 rounded-lg flex items-center gap-2">
               <span>💡</span> <span><strong>İpucu:</strong> Sayfayı kendiniz kaydırsanız bile sayaç canlı olarak toplanan tweetleri anında sayar. Toplama bitince yeşil <strong>"📥 JSON İndir"</strong> butonuna basmanız yeterlidir.</span>
             </div>
           </div>

@@ -1,3 +1,33 @@
+## 2026-09-13 23:42 — Akıllı Artımlı İçe Aktarma (Bookmarklet Auto-Stop) Desteği Eklendi
+
+- **Type:** `Feature`
+- **Status:** `Completed`
+- **Branch:** `main`
+- **Commit:** `ab230e1`
+- **Developer:** `AI Agent`
+- **Scope:** `İçe Aktarma & Bookmarklet`
+
+### Summary
+X/Twitter yer imlerini içe aktarırken tüm geçmişi baştan sona tarama zorunluluğunu ortadan kaldıran akıllı artımlı durdurma (smart incremental auto-stop) özelliği geliştirildi. Bookmarklet, yerel veritabanında veya tarayıcı önbelleğinde kayıtlı olan tweet kimliklerini tespit ettiği anda otomatik kaydırmayı durdurur; böylece sadece yeni eklenen yer imleri saniyeler içinde çekilir.
+
+### Changes
+- `app/api/import/route.ts` API rotasına `GET` metodu eklendi; veritabanındaki son aktarılan tweet ID'leri ve toplam sayı CORS desteğiyle dışa açıldı.
+- `lib/import/bookmarklet.ts` betiği geliştirildi:
+  - Yerel API (`http://localhost:3000/api/import`) ve tarayıcı `localStorage` önbelleğinden bilinen tweet ID'lerini dinamik olarak hafızaya alma yeteneği eklendi.
+  - Kayan panel UI'ına bağlantı durumu rozeti ve `[x] 🎯 Kayıtlı tweette dur` onay kutusu eklendi.
+  - Sayfa aşağı kaydırılırken daha önce veritabanına eklenmiş bir tweet ile karşılaşıldığı anda otomatik kaydırmayı durduran erken sonlandırma mantığı entegre edildi.
+  - Çıktı formatı ve minifikasyon yapısı güncellendi.
+- `app/import/page.tsx` sayfasına akıllı artımlı içe aktarma mekanizmasını açıklayan bilgilendirme kutusu eklendi.
+- `PROJECT_RULES.md` dosyası `/api/import` GET metodu ve CORS tanımları ile güncellendi.
+
+### Validation
+- `npx tsc --noEmit` — `PASS`
+- `npx tsx test/verify.ts` — `PASS`
+- `npm run build` — `PASS` (13 rota başarıyla derlendi)
+
+### Notes
+Kullanıcı tüm geçmişi yeniden taramak isterse kayan paneldeki "Kayıtlı tweette dur" onay kutusunun işaretini kaldırarak derin tarama yapmaya devam edebilir.
+
 ## 2026-09-13 23:26 — Ayarlar ve Pipeline Arayüzlerine Obsidian Senkronizasyon Desteği Eklendi
 
 - **Type:** `Feature`
